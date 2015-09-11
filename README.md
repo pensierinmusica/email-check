@@ -9,7 +9,7 @@ Email check is a [npm](http://npmjs.org) async module for [NodeJS](http://nodejs
 
 It first validates the email through regex, and then pings the relative MX server.
 
-It works with native JS promises (and needs a JS engine that supports them).
+It works with native JS promises (and needs a JS engine that supports them, like Node >= v4.0.0).
 
 ## Install
 
