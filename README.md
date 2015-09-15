@@ -21,7 +21,7 @@ It works with native JS promises (and needs a JS engine that supports them, like
 
 `emailCheck(email, [opts])`
 
-The function signature accepts two arguments and returns a promise, eventually fulfilled with `true` if the email address exists, or `false` if it doesn't.
+The function signature accepts two arguments and returns a promise, eventually fulfilled with `true` if the email address exists, or `false` if it doesn't (please note that if your Internet connection is down, or port 25 is closed – e.g. by a firewall – it will always return `false`).
 
 - `email` (string) the email address to check.
 - `opts` (object) the options object.
@@ -29,8 +29,8 @@ The function signature accepts two arguments and returns a promise, eventually f
 The options object can have three properties:
 
 - `from` (string) email address originating the request (defaults to the same value as "email").
-- `host` (string) fqdn of SMTP server originating the request (defaults to an empty string).
-- `timeout` (number) max allowed idle time in milliseconds (defaults to 5000).
+- `host` (string) fqdn of SMTP server originating the request (defaults to the domain name of the "from" email address).
+- `timeout` (number) max allowed idle time in milliseconds (defaults to 5000). If the timeout expires, the promise returns `false`.
 
 ### Example
 
@@ -40,10 +40,14 @@ var emailCheck = require('email-check');
 // Quick version
 emailCheck('mail@example.com')
   .then(function (res) {
-    console.log(res);
+    // Returns "true" if the email address exists, "false" if it doesn't.
   })
   .catch(function (err) {
-    console.error(err);
+    if (err.message === 'refuse') {
+      // The MX server is refusing requests from your IP address.
+    } else {
+      // Decide what to do with other errors.
+    }
   });
 
 // With custom options

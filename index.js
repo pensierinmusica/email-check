@@ -19,13 +19,13 @@ function validateEmail (email) {
 module.exports = function (email, opts) {
   return new Promise(function (resolve, reject) {
     email = validateEmail(email);
-    email ? resolve(email.split('@')[1]) : reject(false);
+    email ? resolve(email.split('@')[1]) : reject();
   })
     .then(function (domain) {
       return promisify(dns.resolveMx, [domain]);
     })
     .catch(function (err) {
-      return false;
+      throw(new Error('wrong'));
     })
     .then(function (addresses) {
       if (addresses.length === 1) {
@@ -47,12 +47,12 @@ module.exports = function (email, opts) {
     .then(function (address) {
       opts = opts || {};
       var options = {
-        from: opts.from || email,
-        host: opts.host || '',
+        from: validateEmail(opts.from) || email,
         timeout: opts.timeout || 5000
       };
+      options.host = opts.host || options.from.split('@')[1];
       var step = 0;
-      var comm = [
+      const COMM = [
         'helo ' + options.host + '\n',
         'mail from:<' + options.from + '>\n',
         'rcpt to:<' + email + '>\n'
@@ -64,23 +64,34 @@ module.exports = function (email, opts) {
           resolve(false);
         });
         socket.on('data', function (data) {
+          if (data.toString()[0] !== '2') {
+            socket.destroy();
+            reject(new Error('refuse'));
+          }
           if (step < 3) {
-            socket.write(comm[step], function () {
+            socket.write(COMM[step], function () {
               step++;
             });
           } else {
             socket.destroy();
-            data.toString()[0] === '2' ? resolve(true) : resolve(false);
+            resolve(true);
           }
         });
         socket.on('error', function (err) {
           socket.destroy();
           if (err.code === 'ECONNRESET') {
-            resolve(false);
+            reject(new Error('refuse'));
           } else {
-            throw err;
+            reject(err);
           }
         })
       });
+    })
+    .catch(function (err) {
+      if (err.message === 'wrong') {
+        return false;
+      } else {
+        throw err;
+      }
     })
 };
