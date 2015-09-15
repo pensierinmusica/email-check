@@ -1,6 +1,6 @@
 {
   "name": "email-check",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Async Node JS module to check if an email address exists",
   "repository": {
     "type": "git",
