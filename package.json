@@ -13,7 +13,7 @@
   "author": "Alessandro Zanardi",
   "license": "MIT",
   "dependencies": {
-    "js-promisify": "0.0.1"
+    "js-promisify": "1.0.1"
   },
   "engines": {
     "node": ">=4.0.0"
