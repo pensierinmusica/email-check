@@ -53,9 +53,9 @@ module.exports = function (email, opts) {
       options.host = opts.host || options.from.split('@')[1];
       var step = 0;
       const COMM = [
-        'helo ' + options.host + '\n',
-        'mail from:<' + options.from + '>\n',
-        'rcpt to:<' + email + '>\n'
+        'helo ' + options.host + '\r\n',
+        'mail from:<' + options.from + '>\r\n',
+        'rcpt to:<' + email + '>\r\n'
       ];
       return new Promise(function (resolve, reject) {
         var socket = net.createConnection(25, address);
